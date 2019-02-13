@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">NoSleepService</string>
+    <string name="notification_title">NoSleepService</string>
+    <string name="notification_text">A service that prevent the screen to go to sleep.</string>
+    <string name="notification_tickle">NoSleepService</string>
+    <string name="startService">Device can sleep</string>
+    <string name="stopService">Device won\'t sleep</string>
+    <string name="nosleepservice_channel_name">No Sleep Service</string>
+    <string name="nosleepservice_channel_id">No Sleep Service channel</string>
+    <string name="appdescription">The No Sleep Service will prevent the device to go to sleep.\nService can be started with adb:\nadb shell am broadcast -a com.zebra.nosleepservice.startservice\nService can be stopped with adb:\nadb shell am broadcast -a com.zebra.nosleepservice.stopservice</string>
+</resources>
