@@ -22,7 +22,9 @@ The service can be started and stopped manually using the following adb commands
  - Stop service:
   adb shell am broadcast -a com.zebra.nosleepservice.stopservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.StopServiceBroadcastReceiver
 
-
+-------------------------------------------------------
+                   EULA License
+-------------------------------------------------------
 # END USER LICENSE AGREEMENT (UNRESTRICTED SOFTWARE)
 
 
