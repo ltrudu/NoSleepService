@@ -5,6 +5,7 @@ import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,11 @@ public class NoSleepService extends Service {
     private void startService(int flags, int startId)
     {
         Intent mainActivityIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                mainActivityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Create the Foreground Service
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -75,6 +81,7 @@ public class NoSleepService extends Service {
                 .setTicker(getString(R.string.notification_tickle))
                 .setPriority(PRIORITY_MIN)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setContentIntent(pendingIntent)
                 .build();
 
         TaskStackBuilder localTaskStackBuilder = TaskStackBuilder.create(this);

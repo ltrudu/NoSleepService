@@ -18,18 +18,18 @@ import android.widget.Switch;
 // be restarted automatically once the reboot is completed.
 //
 // The service respond to two intent actions (both uses the category: android.intent.category.DEFAULT)
-// - com.zebra.nosleepservice.startservice :
+// - "com.zebra.nosleepservice.startservice" sent on the component "com.zebra.nosleepservice/com.zebra.nosleepservice.StartServiceBroadcastReceiver":
 //   Start the service.
 //   If the device get rebooted the service will start automatically once the reboot is completed.
-// - com.zebra.nosleepservice.stopservice
+// - "com.zebra.nosleepservice.stopservice" sent on the component "com.zebra.nosleepservice/com.zebra.nosleepservice.StopServiceBroadcastReceiver":
 //   Stop the service.
 //   If the device is rebooted, the service will not be started.
 //
 // The service can be started and stopped manually using the following adb commands:
 //  - Start service:
-//      adb shell am broadcast -a com.zebra.nosleepservice.startservice
+//      adb shell am broadcast -a com.zebra.nosleepservice.startservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.StartServiceBroadcastReceiver
 //  - Stop service:
-//      adb shell am broadcast -a com.zebra.nosleepservice.stopservice
+//      adb shell am broadcast -a com.zebra.nosleepservice.stopservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.StopServiceBroadcastReceiver
 public class MainActivity extends AppCompatActivity {
 
     public static final String SHARED_PREFERENCES_NAME = "NoSleepService";
