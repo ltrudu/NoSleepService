@@ -22,18 +22,24 @@ The service can be started and stopped manually using the following adb commands
 
 - Start service:
     adb shell am broadcast -a com.zebra.nosleepservice.startservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.StartServiceBroadcastReceiver
+    
 
  - Stop service:
   adb shell am broadcast -a com.zebra.nosleepservice.stopservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.StopServiceBroadcastReceiver
   
+  
  - Setup service
      The service can be configured using the following intent:
      adb shell am broadcast -a com.zebra.nosleepservice.setupservice -n com.zebra.nosleepservice/com.zebra.nosleepservice.SetupServiceBroadcastReceiver --es startonboot "true" --es startoncharging "true"
+     
      The command must contain at least one of the extras:
+     
 	 - Configure autostart on boot:
 		--es startonboot "true"
+		
 	 - Configure autostart on power connection (AC/USB/Wireless)
 		--es startoncharging "true"
+		
      The extras value can be set to "true" or "1" to enable the option and "false" or "0" to disable the option.
 
 # -------------------------------------------------------
