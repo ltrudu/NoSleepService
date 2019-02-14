@@ -4,19 +4,26 @@ The service can be launched using the graphical user interface, intent actions o
 
 If the option "Start on boot" is enabled, the service will be automatically launched when the boot is complete.
 
+
 Power events occur when the device is connected to a power source (AC/USB/Wireless).
+
 If the option "Start when charging / Stop when charging" is enabled, the power events will be monitored.
-The NoSleepService will be launched when the device is connected to a power source
+
+The NoSleepService will be launched when the device is connected to a power source.
+
 
 The service respond to two intent actions (both uses the category: android.intent.category.DEFAULT)
 
 - "com.zebra.nosleepservice.startservice" sent on the component "com.zebra.nosleepservice/com.zebra.nosleepservice.StartServiceBroadcastReceiver":
+
     Start the service.
     If the device get rebooted the service will start automatically once the reboot is completed.
 
 - "com.zebra.nosleepservice.stopservice" sent on the component "com.zebra.nosleepservice/com.zebra.nosleepservice.StopServiceBroadcastReceiver":
+
     Stop the service.
     If the device is rebooted, the service will not be started.
+    
 
 The service can be started and stopped manually using the following adb commands:
 
