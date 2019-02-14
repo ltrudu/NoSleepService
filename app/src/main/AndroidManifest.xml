@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -13,8 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
-            android:launchMode= "singleInstance">
+        <activity android:name=".LicenceActivity"></activity>
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,12 +29,18 @@
             android:enabled="true"
             android:exported="true" />
 
+        <service
+            android:name=".PowerEventsWatcherService"
+            android:enabled="true"
+            android:exported="true" />
+
         <receiver
             android:name=".BootCompletedBroadcastReceiver"
             android:enabled="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
@@ -41,6 +49,7 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.zebra.nosleepservice.startservice" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
@@ -49,6 +58,26 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.zebra.nosleepservice.stopservice" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".SetupServiceBroadcastReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.zebra.nosleepservice.setupservice" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <!-- Register PowerConnectionReceiver in AndroidManifest for build < Oreo -->
+        <receiver
+            android:name=".PowerConnectionReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
