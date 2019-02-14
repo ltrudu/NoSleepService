@@ -7,7 +7,7 @@
     <string name="serviceStarted">Service is running</string>
     <string name="startOnBoot">Start on boot</string>
     <string name="doNothingOnBoot">Do nothing on boot</string>
-    <string name="startOnCharging">Start when charging\nStop when not charging</string>
+    <string name="startOnCharging">Start when charging \nStop when not charging</string>
     <string name="doNothingOnCharging">Power events not\nmonitored</string>
     <string name="nosleepservice_channel_name">No Sleep Service</string>
     <string name="nosleepservice_channel_id">No Sleep Service channel</string>
