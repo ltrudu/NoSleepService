@@ -8,15 +8,21 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.backup.FullBackupDataOutput;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
@@ -31,6 +37,10 @@ public class NoSleepService extends Service {
     private PowerManager mPowerManager;
 
     private PowerManager.WakeLock mWakeLock = null;
+
+    private static View mView = null;
+    private static WindowManager mWindowManager = null;
+
 
     public NoSleepService() {
     }
@@ -103,12 +113,14 @@ public class NoSleepService extends Service {
             }
 
             // Acquire wakelock for service
-            this.mWakeLock = this.mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP, "zebra:NoSleepService");
+            this.mWakeLock = this.mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP , "zebra:NoSleepService");
             this.mWakeLock.setReferenceCounted(false);
             this.mWakeLock.acquire();
 
             // Disable keyguard
             this.mKeyguardManager.newKeyguardLock("zebra:NoSleepService").disableKeyguard();
+
+            createOverlayWindowToForceScreenOn(this);
             logD("startService:Service started without error.");
         }
         catch(Exception e)
@@ -128,6 +140,7 @@ public class NoSleepService extends Service {
             if (this.mWakeLock != null) {
                 this.mWakeLock.release();
             }
+            cleanupWindow(this);
             stopForeground(true);
             logD("stopService:Service stopped without error.");
         }
@@ -186,4 +199,93 @@ public class NoSleepService extends Service {
         }
         return false;
     }
+
+
+    public static boolean checkForOverlayPermission(Context context)
+    {
+        if( Settings.canDrawOverlays(context) == false )
+        {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean createOverlayWindowToForceScreenOn(Context context) {
+        // First check if we can draw an overlay window
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && checkForOverlayPermission(context) == false)
+        {
+            return false;
+        }
+
+        try
+        {
+            // We save the current state of mView
+            // If a view is already existing we wants to remove it correctly.
+            View saveView = mView;
+
+            // Retrieve the window service
+            if(mWindowManager == null)
+                mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
+
+            // Create a new View for our layout
+            mView = new View(context);
+
+            // We create a new layout with the following parameters
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+
+            // The smallest is the stealthiest
+            layoutParams.width = 0;
+            layoutParams.height = 0;
+
+            // Transparency is a plus... for a zero sized layout
+            layoutParams.format = PixelFormat.TRANSPARENT;
+            layoutParams.alpha = 0f;
+
+            // We force the window to be not focusable and not touchable to avoid
+            // disruptions with the other apps and the launcher
+            // In case of someone would manage to "touch" this zero sized sub pixel
+            layoutParams.flags =
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+
+            // The type toast will be accepted by the system without specific permissions
+            int windowType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
+            layoutParams.type = windowType;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+
+            mWindowManager.addView(mView, layoutParams);
+            mView.setVisibility(View.VISIBLE);
+
+            if(saveView != null)
+            {
+                saveView.setVisibility(View.GONE);
+                mWindowManager.removeView(saveView);
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private static void cleanupWindow(Context context) {
+        // Revert to portray mode before cleaning up things
+        createOverlayWindowToForceScreenOn(context);
+
+        if(mView != null)
+        {
+            mWindowManager.removeView(mView);
+            mView = null;
+        }
+        if(mWindowManager != null)
+        {
+            mWindowManager = null;
+        }
+    }
+
 }
