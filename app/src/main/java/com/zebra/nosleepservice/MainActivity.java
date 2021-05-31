@@ -4,8 +4,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -46,6 +49,7 @@ import android.widget.Switch;
 //          The extras value can be set to "true" or "1" to enable the option and "false" or "0" to disable the option.
 public class MainActivity extends AppCompatActivity {
 
+    private static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 203;
     private Switch mStartStopServiceSwitch = null;
     private Switch mAutoStartServiceOnBootSwitch = null;
     private Switch mAutoStartServiceOnCraddleSwitch = null;
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         updateSwitches();
         launchPowerEventsWatcherServiceIfNecessary();
+        RequestPermission();
     }
 
     @Override
@@ -142,6 +147,33 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         updateSwitches();
         launchPowerEventsWatcherServiceIfNecessary();
+    }
+
+    private void RequestPermission() {
+        // Check if Android M or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Show alert dialog to the user saying a separate permission is needed
+            // Launch the settings activity if the user prefers
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + this.getPackageName()));
+            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    RequestPermission();
+                } else {
+                    //Permission Granted-System will work
+                }
+
+            }
+        }
     }
 
     public void updateSwitches()

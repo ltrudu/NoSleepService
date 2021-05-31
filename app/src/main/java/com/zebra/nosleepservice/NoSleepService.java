@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -29,7 +30,7 @@ import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
 import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 
 public class NoSleepService extends Service {
-    private static final int SERVICE_ID = 1;
+    private static final int SERVICE_ID = 122315;
 
     private NotificationManager mNotificationManager;
     private Notification mNotification;
@@ -69,6 +70,10 @@ public class NoSleepService extends Service {
     public void onDestroy()
     {
         logD("onDestroy");
+        if (this.mWakeLock != null) {
+            this.mWakeLock.release();
+        }
+        cleanupWindow(this);
         stopService();
     }
 
@@ -104,8 +109,15 @@ public class NoSleepService extends Service {
             localTaskStackBuilder.addNextIntent(mainActivityIntent);
             notificationBuilder.setContentIntent(localTaskStackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT));
 
+            try{
+                startForeground(SERVICE_ID, mNotification);
+
+            }
+            catch(Exception e)
+            {
+                Log.d("toto", e.getMessage());
+            }
             // Start foreground service
-            startForeground(SERVICE_ID, mNotification);
 
             // Release current wakelock if any
             if ((this.mWakeLock != null) && (this.mWakeLock.isHeld())) {
@@ -122,6 +134,8 @@ public class NoSleepService extends Service {
 
             createOverlayWindowToForceScreenOn(this);
             logD("startService:Service started without error.");
+
+            //mNotificationManager.notify(SERVICE_ID, mNotification );
         }
         catch(Exception e)
         {
@@ -137,10 +151,10 @@ public class NoSleepService extends Service {
         try
         {
             logD("stopService.");
-            if (this.mWakeLock != null) {
-                this.mWakeLock.release();
-            }
-            cleanupWindow(this);
+            //if (this.mWakeLock != null) {
+            //    this.mWakeLock.release();
+            //}
+            //cleanupWindow(this);
             stopForeground(true);
             logD("stopService:Service stopped without error.");
         }
@@ -201,24 +215,8 @@ public class NoSleepService extends Service {
     }
 
 
-    public static boolean checkForOverlayPermission(Context context)
-    {
-        if( Settings.canDrawOverlays(context) == false )
-        {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
-            context.startActivity(intent);
-            return false;
-        }
-        return true;
-    }
 
     private static boolean createOverlayWindowToForceScreenOn(Context context) {
-        // First check if we can draw an overlay window
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && checkForOverlayPermission(context) == false)
-        {
-            return false;
-        }
-
         try
         {
             // We save the current state of mView
@@ -255,6 +253,12 @@ public class NoSleepService extends Service {
             int windowType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
             layoutParams.type = windowType;
             layoutParams.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON;
+
+
 
             mWindowManager.addView(mView, layoutParams);
             mView.setVisibility(View.VISIBLE);
