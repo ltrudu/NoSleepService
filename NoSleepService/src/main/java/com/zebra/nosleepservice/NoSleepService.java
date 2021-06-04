@@ -22,7 +22,10 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -229,26 +232,28 @@ public class NoSleepService extends Service {
 
 
             // Create a new View for our layout
-            mView = new View(context);
+            // mView = new View(context);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mView = inflater.inflate(R.layout.screen_saver, null);
 
             // We create a new layout with the following parameters
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
 
             // The smallest is the stealthiest
-            layoutParams.width = 0;
-            layoutParams.height = 0;
+            //layoutParams.width = 0;
+            //layoutParams.height = 0;
 
             // Transparency is a plus... for a zero sized layout
-            layoutParams.format = PixelFormat.TRANSPARENT;
-            layoutParams.alpha = 0f;
+            //layoutParams.format = PixelFormat.TRANSPARENT;
+            //layoutParams.alpha = 40f;
 
             // We force the window to be not focusable and not touchable to avoid
             // disruptions with the other apps and the launcher
             // In case of someone would manage to "touch" this zero sized sub pixel
-            layoutParams.flags =
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                            | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-
+            //layoutParams.flags =
+            //        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            //                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+//
             // The type toast will be accepted by the system without specific permissions
             int windowType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
             layoutParams.type = windowType;
@@ -258,10 +263,19 @@ public class NoSleepService extends Service {
             layoutParams.flags |= WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
             layoutParams.flags |= WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON;
 
-
+            // screen saver
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 
             mWindowManager.addView(mView, layoutParams);
             mView.setVisibility(View.VISIBLE);
+
+            mView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    mView.setVisibility(View.INVISIBLE);
+                    return false;
+                }
+            });
 
             if(saveView != null)
             {
