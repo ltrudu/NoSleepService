@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch mAutoStartServiceOnCraddleSwitch = null;
     public static MainActivity mMainActivity;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,13 +151,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void RequestPermission() {
-        // Check if Android M or higher
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Show alert dialog to the user saying a separate permission is needed
-            // Launch the settings activity if the user prefers
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + this.getPackageName()));
-            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+        // check if we have the permission already granted
+        if (!Settings.canDrawOverlays(this)) {
+            // Check if Android M or higher
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // Show alert dialog to the user saying a separate permission is needed
+                // Launch the settings activity if the user prefers
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + this.getPackageName()));
+                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+            }
+        }
+        else
+        {
+            // We already have the permission granted, we do nothing
         }
     }
 
