@@ -14,3 +14,6 @@
 app/release/NoSleepService_RELEASE_V1.0.apk
 app/release/NoSleepService_RELEASE_V1.1.apk
 app/release/output.json
+ZebraScreenSaver/build/outputs/
+ZebraScreenSaver/build/intermediates/transforms/dexBuilder/release/0/android/support/v7/appcompat/R$string.dex
+ZebraScreenSaver/build/
