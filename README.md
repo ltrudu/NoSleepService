@@ -1,3 +1,6 @@
+*Please be aware that this library / application / sample is provided as a community project without any guarantee of support*
+=========================================================
+
 The NoSleep Service prevent the device to go on sleep mode when it is activated.
 
 The service can be launched using the graphical user interface, intent actions or adb.
